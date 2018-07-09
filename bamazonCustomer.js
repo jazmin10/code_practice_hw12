@@ -21,35 +21,28 @@
 	// Returns an array of the list of items that are being sold
 	function setChoices(list) {
 
-		// Will store the array of the choices that will be used in the prompt questions
 		var choicesArr = [];
 
-		// loops through the list and ...
+		// loops through the list and adds nicely formatted choices to the choicesArr
 		list.forEach(function(item) {
 
-			// creates a nice string of the item being sold
 			var displayString = "product: " + item.product_name + " | price: " + item.price;
 
-			// adds the string to the choicesArr
 			choicesArr.push(displayString);
 		});
 
-		// Returns the choicesArr
 		return choicesArr;
 	}
 
 	// Find the information of the product chosen by finding its object in the itemsArr
 	function findProduct(str) {
 
-		// Set the start index and end index of where we will be slicing our string
+		// We first find the name of the product
+		// In other words, we want "apples" NOT "product: apples | price: 1.49"
 		var start = str.indexOf(":") + 2;
 		var end = str.indexOf("|") - 1;
-
-		// Storing the name of the product chosen by slicing the string
-		// In other words, we want "apples" NOT "product: apples | price: 1.49"
 		var productName = str.slice(start, end);
 
-		// Will store the object of the product chosen
 		var product = {};
 
 		// Loop through our items array and ...
@@ -67,14 +60,33 @@
 
 	}
 
-	// Submit the purchase by...
+	// Complete the purchase if there is enough product in stock
 	function makePurchase(answers) {
 		
-		// Finding the information of the product chosen by the user
+		// First, we find the information of the product chosen by the user
 		var productChosen = findProduct(answers.item);
 
-		connection.end();
+		var qtyRequested = parseInt(answers.amount);
+
+		// If there isn't enough product to fulfill the purchase, then notify the user
+		if (productChosen.stock_quantity < qtyRequested) {
+			console.log("Insufficient quantity!");
+			connection.end();
+		}
+		// If there is enough product in stock, then complete the purchase
+		else {
+
+			var total = qtyRequested * productChosen.price;
+			console.log("The total will be: $" + total);
+
+			// updateDatabase(productChosen, qtyPurchased);
+		}
+
 	}
+
+	// function updateDatabase(product, qtyPurchased) {
+		
+	// }
 
 // ================== MAIN PROCESSES ==================
 
@@ -103,7 +115,7 @@
 				message: "How many?"
 			}];
 
-			// Ask the user the product they want to purchase and quantity, then make purchase
+			// Ask the user the product they want to purchase and quantity, then complete the purchase
 			inquirer.prompt(mainPrompt).then(makePurchase);
 
 		});
