@@ -43,16 +43,15 @@
 
 		var product = {};
 
-		// Loop through our items array and ...
+		// Loop through itemsArr and ...
 		itemsArr.forEach(function(item) {
-			// If the product name of the object matches the productName, then set
+			// If the object's product name matches the productName, then set
 			// product to the current object
 			if (item.product_name === productName) {
 				product = item;
 			}
 		});
 
-		// Return the product's object
 		return product;
 
 	}
@@ -95,7 +94,7 @@
 			item_id: product.item_id
 		}];
 
-		// update the database with new stock_quantity amount
+		// update stock_quantity in the database
 		connection.query("UPDATE products SET ? WHERE ?", queryArr, function(err, updateRes) {
 			if (err) throw err;
 			
@@ -118,13 +117,11 @@
 			// Set itemsArr equal to readResults
 			itemsArr = readResults;
 
-
 			// Set the questions that will be asked to the user
 			var mainPrompt = [{
 				name: "item",
 				type: "list",
 				message: "Select item you want to purchase: ",
-				// create an array of choices with the list of items returned from the database
 				choices: setChoices(readResults)
 			}, {
 				name: "amount",
