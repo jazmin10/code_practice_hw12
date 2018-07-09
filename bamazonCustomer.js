@@ -25,9 +25,7 @@
 
 		// loops through the list and adds nicely formatted choices to the choicesArr
 		list.forEach(function(item) {
-
 			var displayString = "product: " + item.product_name + " | price: " + item.price;
-
 			choicesArr.push(displayString);
 		});
 
@@ -47,7 +45,6 @@
 
 		// Loop through our items array and ...
 		itemsArr.forEach(function(item) {
-
 			// If the product name of the object matches the productName, then set
 			// product to the current object
 			if (item.product_name === productName) {
@@ -70,7 +67,10 @@
 
 		// If there isn't enough product to fulfill the purchase, then notify the user
 		if (productChosen.stock_quantity < qtyRequested) {
+
 			console.log("Insufficient quantity!");
+
+			// End the connection
 			connection.end();
 		}
 		// If there is enough product in stock, then complete the purchase
@@ -79,14 +79,31 @@
 			var total = qtyRequested * productChosen.price;
 			console.log("The total will be: $" + total);
 
-			// updateDatabase(productChosen, qtyPurchased);
+			updateDatabase(productChosen, qtyRequested);
 		}
 
 	}
 
-	// function updateDatabase(product, qtyPurchased) {
-		
-	// }
+	// Updates the product's stock quantity with new amount
+	function updateDatabase(product, qtyPurchased) {
+
+		var newqty = product.stock_quantity - qtyPurchased;
+
+		var queryArr = [{
+			stock_quantity: newqty
+		}, {
+			item_id: product.item_id
+		}];
+
+		// update the database with new stock_quantity amount
+		connection.query("UPDATE products SET ? WHERE ?", queryArr, function(err, updateRes) {
+			if (err) throw err;
+			
+			// Once database has been updated, end the connection
+			connection.end();
+		});
+
+	}
 
 // ================== MAIN PROCESSES ==================
 
