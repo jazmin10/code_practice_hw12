@@ -148,6 +148,54 @@
 		
 	}
 
+	// Adds a new product to the database
+	function addProduct() {
+
+		var addProdPrompt = [{
+			name: "nameInput",
+			type: "input",
+			message: "Enter name of product: "
+		}, {
+			name: "deptInput",
+			type: "input",
+			message: "Enter name of department: "
+		}, {
+			name: "priceInput",
+			type: "input",
+			message: "Enter price: "
+		}, {
+			name: "stockInput",
+			type: "input",
+			message: "Enter stock quantity: "
+		}];
+
+		// Prompts user to enter new product information
+		inquirer.prompt(addProdPrompt).then(function(addAns) {
+		
+			var name = addAns.nameInput;
+			var dept = addAns.deptInput;
+			var price = parseFloat(addAns.priceInput);
+			var stock = parseInt(addAns.stockInput);
+
+			var addProdQuery = "INSERT INTO products SET ?";
+			var queryValues = [{
+				product_name: name,
+				department_name: dept,
+				price: price,
+				stock_quantity: stock
+			}];
+
+			// Inserts new product to the table
+			connection.query(addProdQuery, queryValues, function(err) {
+				if (err) throw err;
+
+				console.log("Your product was added successfully!");
+				
+				connection.end();
+			});
+		});
+	}
+
 // ================== MAIN PROCESSES ==================
 
 	// Connect to the database
@@ -170,7 +218,7 @@
 					listProducts(addInventory);
 					break;
 				case "Add New Product":
-					console.log("add a product");
+					addProduct();
 					break;
 			}
 
