@@ -48,6 +48,27 @@
 		});
 	}
 
+	// Displays a list of products with low inventory
+	function viewLow() {
+
+		var queryStr = "SELECT * FROM products WHERE stock_quantity < 5";
+
+		// Grabs from the database the list of products with less than 5 items in stock
+		connection.query(queryStr, function(err, lowInvRes) {
+
+			if (err) throw err;
+
+			// Console logs each product along with id and quantity
+			lowInvRes.forEach(function(product) {
+				var str = "id: " + product.item_id;
+				str += " | product: " + product.product_name;
+				str += " | quantity: " + product.stock_quantity;
+
+				console.log(str);
+			});
+		});
+	}
+
 // ================== MAIN PROCESSES ==================
 
 	// Connect to the database
@@ -63,7 +84,7 @@
 					viewAll();
 					break;
 				case "View Low Inventory":
-					console.log("view products with less than 5 items");
+					viewLow();
 					break;
 				case "Add to Inventory":
 					console.log("update inventory");
