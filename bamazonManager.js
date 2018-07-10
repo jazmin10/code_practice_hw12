@@ -52,6 +52,8 @@
 
 			console.log(str);
 		});
+
+		connection.end();
 	}
 
 	// Displays a list of products with low inventory
@@ -71,15 +73,79 @@
 				str += " | quantity: " + product.stock_quantity;
 
 				console.log(str);
+
 			});
 		});
+
+		connection.end();
+
 	}
 
 
-	function addInventory() {
+	// Adds inventory to a specific product
+	function addInventory(list) {
 
-		// connection.query()
+		var addPrompt = [{
+			name: "product",
+			type: "list",
+			message: "Which product would you like to add inventory to?",
+			choices: setChoices(list)
+		}, {
+			name: "amount",
+			type: "input",
+			message: "Enter the amount of inventory you would like to add to the product: "
+		}];
 
+		// Prompt user to pick a product and the quantity of units they want to add to stock
+		inquirer.prompt(addPrompt).then(function(addRes) {
+			var prodArr = addRes.product.split("|");
+
+			var productID = findNum(prodArr[0].trim());
+			var newQty = findNum(prodArr[2].trim()) + parseInt(addRes.amount);
+			
+			var addQuery = "UPDATE products SET ? WHERE ?";
+
+			// Updates product's stock_quantity with new amount
+			connection.query(addQuery, [{stock_quantity: newQty}, {item_id: productID}], function(err) {
+				if (err) throw err;
+
+				console.log("The product's stock quantity is now: " + newQty + " units");
+			});
+
+			connection.end();
+
+		});
+
+	}
+
+	// Returns an array that can be used as choices for an inquirer question object
+	function setChoices(arrProds) {
+
+		var choicesArr = [];
+
+		// loops through the array of products and adds a nicely formatted product to the choicesArr
+		arrProds.forEach(function(item) {
+			var choiceStr = "id: " + item.item_id;
+			choiceStr += " | product: " + item.product_name;
+			choiceStr += " | quantity: " + item.stock_quantity;
+
+			choicesArr.push(choiceStr);
+		});
+
+		return choicesArr;
+	}
+
+	// Returns the number in the string
+	// Example: given "id: 1", it will return 1
+	function findNum(str) {
+		var numValue = "";
+
+		var start = str.indexOf(":") + 1;
+
+		numValue = str.slice(start);
+
+		return parseInt(numValue);
+		
 	}
 
 // ================== MAIN PROCESSES ==================
@@ -101,14 +167,12 @@
 					viewLow();
 					break;
 				case "Add to Inventory":
-					console.log("update inventory");
+					listProducts(addInventory);
 					break;
 				case "Add New Product":
 					console.log("add a product");
 					break;
 			}
-
-			connection.end();
 
 		});
 	});
