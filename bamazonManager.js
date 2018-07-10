@@ -27,6 +27,27 @@
 
 // ================== FUNCTIONS ==================
 
+	// Displays a list of every available item
+	function viewAll() {
+
+		// Grabs products information from the database
+		connection.query("SELECT * FROM products", function(err, readRes) {
+
+				if (err) throw err;
+
+				// Console logs each product along with id, price, and quantity
+				readRes.forEach(function(product) {
+					
+					var str = "id: " + product.item_id;
+					str += " | product: " + product.product_name;
+					str += " | price: $" + product.price;
+					str += " | quantity: " + product.stock_quantity;
+
+					console.log(str);
+				});
+		});
+	}
+
 // ================== MAIN PROCESSES ==================
 
 	// Connect to the database
@@ -39,7 +60,7 @@
 			// Execute the command chosen by the user
 			switch (answer.command) {
 				case "View Products for Sale":
-					console.log("view all products");
+					viewAll();
 					break;
 				case "View Low Inventory":
 					console.log("view products with less than 5 items");
