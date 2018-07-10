@@ -27,24 +27,30 @@
 
 // ================== FUNCTIONS ==================
 
-	// Displays a list of every available item
-	function viewAll() {
+	// Grabs the list of products stored in the database
+	function listProducts(cb) {
 
-		// Grabs products information from the database
-		connection.query("SELECT * FROM products", function(err, readRes) {
+		connection.query("SELECT * FROM products", function(err, results) {
 
-				if (err) throw err;
+			if (err) throw err;
 
-				// Console logs each product along with id, price, and quantity
-				readRes.forEach(function(product) {
-					
-					var str = "id: " + product.item_id;
-					str += " | product: " + product.product_name;
-					str += " | price: $" + product.price;
-					str += " | quantity: " + product.stock_quantity;
+			// Once the products are grabbed from the database, execute the function passed
+			cb(results);
+		});
+	}
 
-					console.log(str);
-				});
+	// Displays every available product
+	function viewAll(list) {
+
+		// Console logs each product along with id, price, and quantity
+		list.forEach(function(product) {
+			
+			var str = "id: " + product.item_id;
+			str += " | product: " + product.product_name;
+			str += " | price: $" + product.price;
+			str += " | quantity: " + product.stock_quantity;
+
+			console.log(str);
 		});
 	}
 
@@ -69,6 +75,13 @@
 		});
 	}
 
+
+	function addInventory() {
+
+		// connection.query()
+
+	}
+
 // ================== MAIN PROCESSES ==================
 
 	// Connect to the database
@@ -81,7 +94,8 @@
 			// Execute the command chosen by the user
 			switch (answer.command) {
 				case "View Products for Sale":
-					viewAll();
+					// viewAll();
+					listProducts(viewAll);
 					break;
 				case "View Low Inventory":
 					viewLow();
